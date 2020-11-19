@@ -1,2 +1,2 @@
 # redblacktree
-线程安全的红黑树
+a thread safe red-black-tree based on github.com/emirpasic/gods/trees/redblacktree
