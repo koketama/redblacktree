@@ -159,9 +159,9 @@ func (tree *Tree) Size() int {
 }
 
 // Left returns the left-most (min) node or nil if tree is empty.
-func (tree *Tree) Left() (key interface{}, values []Value) {
+func (tree *Tree) left() *Node {
 	if tree.Empty() {
-		return
+		return nil
 	}
 
 	var parent *Node
@@ -170,30 +170,35 @@ func (tree *Tree) Left() (key interface{}, values []Value) {
 		parent = current
 		current = current.Left
 	}
-	return parent.Key, parent.Values
+	return parent
+}
+
+// Left returns the left-most (min) node or nil if tree is empty.
+func (tree *Tree) Left() (key interface{}, values []Value) {
+	node := tree.left()
+	if node == nil {
+		return
+	}
+
+	return node.Key, node.Values
 }
 
 func (tree *Tree) PopLeft() (key interface{}, values []Value) {
-	if tree.Empty() {
+	node := tree.left()
+	if node == nil {
 		return
 	}
 
-	var parent *Node
-	current := tree.Root
-	for current != nil {
-		parent = current
-		current = current.Left
-	}
-	key, values = parent.Key, parent.Values
+	key, values = node.Key, node.Values
 
-	tree.remove(parent)
+	tree.remove(node)
 	return
 }
 
 // Right returns the right-most (max) node or nil if tree is empty.
-func (tree *Tree) Right() (key interface{}, values []Value) {
+func (tree *Tree) right() *Node {
 	if tree.Empty() {
-		return
+		return nil
 	}
 
 	var parent *Node
@@ -202,23 +207,28 @@ func (tree *Tree) Right() (key interface{}, values []Value) {
 		parent = current
 		current = current.Right
 	}
-	return parent.Key, parent.Values
+	return parent
+}
+
+// Right returns the right-most (max) node or nil if tree is empty.
+func (tree *Tree) Right() (key interface{}, values []Value) {
+	node := tree.right()
+	if node == nil {
+		return
+	}
+
+	return node.Key, node.Values
 }
 
 func (tree *Tree) PopRight() (key interface{}, values []Value) {
-	if tree.Empty() {
+	node := tree.right()
+	if node == nil {
 		return
 	}
 
-	var parent *Node
-	current := tree.Root
-	for current != nil {
-		parent = current
-		current = current.Right
-	}
-	key, values = parent.Key, parent.Values
+	key, values = node.Key, node.Values
 
-	tree.remove(parent)
+	tree.remove(node)
 	return
 }
 
