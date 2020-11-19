@@ -25,7 +25,15 @@ type Tree interface {
 	PopMin() (key interface{}, values []Value)
 	Max() (key interface{}, values []Value)
 	PopMax() (key interface{}, values []Value)
-	String() string
+	Topology() string
+	Iterator() Iterator
+}
+
+// Iterator a stateful iterator whose elements are key/value pairs.
+type Iterator interface {
+	Next() bool
+	Key() interface{}
+	Values() []Value
 }
 
 type tree struct {
@@ -117,9 +125,14 @@ func (t *tree) PopMax() (key interface{}, values []Value) {
 	return t.rbt.PopRight()
 }
 
-func (t *tree) String() string {
+func (t *tree) Topology() string {
 	t.RLock()
 	defer t.RUnlock()
 
 	return t.rbt.String()
+}
+
+func (t *tree) Iterator() Iterator {
+	iterator := t.rbt.Iterator()
+	return &iterator
 }
