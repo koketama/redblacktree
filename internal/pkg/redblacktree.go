@@ -113,8 +113,11 @@ func (tree *Tree) Get(key interface{}) (values []Value, found bool) {
 // Remove remove the node from the tree by key.
 // Key should adhere to the comparator's type assertion, otherwise method panics.
 func (tree *Tree) Remove(key interface{}) {
-	var child *Node
 	node := tree.lookup(key)
+	tree.remove(node)
+}
+
+func (tree *Tree) remove(node *Node) {
 	if node == nil {
 		return
 	}
@@ -126,6 +129,8 @@ func (tree *Tree) Remove(key interface{}) {
 		node.Values = pred.Values
 		node = pred
 	}
+
+	var child *Node
 	if node.Left == nil || node.Right == nil {
 		if node.Right == nil {
 			child = node.Left
@@ -155,6 +160,10 @@ func (tree *Tree) Size() int {
 
 // Left returns the left-most (min) node or nil if tree is empty.
 func (tree *Tree) Left() (key interface{}, values []Value) {
+	if tree.Empty() {
+		return
+	}
+
 	var parent *Node
 	current := tree.Root
 	for current != nil {
@@ -164,8 +173,29 @@ func (tree *Tree) Left() (key interface{}, values []Value) {
 	return parent.Key, parent.Values
 }
 
+func (tree *Tree) PopLeft() (key interface{}, values []Value) {
+	if tree.Empty() {
+		return
+	}
+
+	var parent *Node
+	current := tree.Root
+	for current != nil {
+		parent = current
+		current = current.Left
+	}
+	key, values = parent.Key, parent.Values
+
+	tree.remove(parent)
+	return
+}
+
 // Right returns the right-most (max) node or nil if tree is empty.
 func (tree *Tree) Right() (key interface{}, values []Value) {
+	if tree.Empty() {
+		return
+	}
+
 	var parent *Node
 	current := tree.Root
 	for current != nil {
@@ -173,6 +203,23 @@ func (tree *Tree) Right() (key interface{}, values []Value) {
 		current = current.Right
 	}
 	return parent.Key, parent.Values
+}
+
+func (tree *Tree) PopRight() (key interface{}, values []Value) {
+	if tree.Empty() {
+		return
+	}
+
+	var parent *Node
+	current := tree.Root
+	for current != nil {
+		parent = current
+		current = current.Right
+	}
+	key, values = parent.Key, parent.Values
+
+	tree.remove(parent)
+	return
 }
 
 // Clear removes all nodes from the tree.

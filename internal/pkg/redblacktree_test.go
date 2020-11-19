@@ -48,7 +48,7 @@ func TestRBT(t *testing.T) {
 
 	for !tree.Empty() {
 		key, values := tree.Left()
-		fmt.Println(key, values)
+		fmt.Println(tree.Size(), key, values)
 		tree.Remove(key)
 	}
 	fmt.Println("----------------------")

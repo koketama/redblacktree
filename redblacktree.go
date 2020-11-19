@@ -9,10 +9,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Value if the value.id is duplicated, it will be ignored.
 type Value = pkg.Value
 
 var _ Tree = (*tree)(nil)
 
+// Tree supported methods on red-black-tree
 type Tree interface {
 	Put(key interface{}, value Value)
 	Get(key interface{}) (values []Value, found bool)
@@ -20,7 +22,9 @@ type Tree interface {
 	Empty() bool
 	Size() int
 	Min() (key interface{}, values []Value)
+	PopMin() (key interface{}, values []Value)
 	Max() (key interface{}, values []Value)
+	PopMax() (key interface{}, values []Value)
 	String() string
 }
 
@@ -29,6 +33,7 @@ type tree struct {
 	rbt *pkg.Tree
 }
 
+// New create a thread safe red-black-tree based on github.com/emirpasic/gods/trees/redblacktree
 func New(comparator utils.Comparator) (Tree, error) {
 	if comparator == nil {
 		return nil, errors.New("comparator required")
@@ -50,7 +55,7 @@ func (t *tree) Put(key interface{}, value Value) {
 
 func (t *tree) Get(key interface{}) (values []Value, found bool) {
 	if key == nil {
-		return nil, false
+		return
 	}
 
 	t.RLock()
@@ -91,11 +96,25 @@ func (t *tree) Min() (key interface{}, values []Value) {
 	return t.rbt.Left()
 }
 
+func (t *tree) PopMin() (key interface{}, values []Value) {
+	t.Lock()
+	defer t.Unlock()
+
+	return t.rbt.PopLeft()
+}
+
 func (t *tree) Max() (key interface{}, values []Value) {
 	t.RLock()
 	defer t.RUnlock()
 
 	return t.rbt.Right()
+}
+
+func (t *tree) PopMax() (key interface{}, values []Value) {
+	t.Lock()
+	defer t.Unlock()
+
+	return t.rbt.PopRight()
 }
 
 func (t *tree) String() string {
